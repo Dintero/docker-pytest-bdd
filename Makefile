@@ -7,6 +7,7 @@ build:
 
 test:
 	@docker run \
+	--rm \
 	-e PYTEST_ADDOPTS="$(PYTEST_ADDOPTS)" \
 	-v $(CURDIR)/example:/example \
 	-w /example $(TAG) \
