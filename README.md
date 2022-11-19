@@ -41,8 +41,14 @@ run with volume mount
 The docker image installs many useful libraries
 for testing REST APIs with pytest-bdd.
 
+ - boto3
  - [bravado_core]: support for the OpenAPI Specification v2.0. (Swagger 2)
+ - cryptography
+ - pytcodestyle
  - [PyJWT]: JSON Web Token implementation in Python
+ - pytest-bdd
+ - pytest-parallel
+ - pytest
  - [Requests]: HTTP for Humans
 
 See the [requirements.txt] for complete list of libraries installed by the [Dockerfile].
