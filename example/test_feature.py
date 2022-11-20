@@ -1,13 +1,18 @@
 import requests
-
+from pytest import fixture
 from pytest_bdd import (
     scenarios, given, when, then, parsers
 )
 
 
+@fixture
+def request_ctx():
+    return dict()
+
+
 @given('a <url>')
-def request_ctx(url):
-    return dict(url=url)
+def given_url(request_ctx, url):
+    request_ctx['url'] = url
 
 
 @when(parsers.parse("I request {method}"))
