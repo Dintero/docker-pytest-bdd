@@ -45,7 +45,7 @@ for testing REST APIs with pytest-bdd.
  - [bravado_core]: support for the OpenAPI Specification v2.0. (Swagger 2)
  - PyCryptodome
  - pytcodestyle
- - [PyJWT]: JSON Web Token implementation in Python
+ - python-jose
  - pytest-bdd
  - pytest-parallel
  - pytest
