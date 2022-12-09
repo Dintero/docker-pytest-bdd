@@ -3,7 +3,7 @@ attrs==22.1.0
 boto3==1.26.13
 botocore==1.29.13
 bravado-core==5.17.1
-certifi==2022.9.24
+certifi==2022.12.7
 charset-normalizer==2.1.1
 ecdsa==0.18.0
 exceptiongroup==1.0.4
