@@ -22,6 +22,7 @@ msgpack==1.0.4
 packaging==21.3
 parse==1.19.0
 parse-type==0.6.0
+pgpy==0.6.0
 pluggy==1.0.0
 py==1.11.0
 pyasn1==0.4.8
