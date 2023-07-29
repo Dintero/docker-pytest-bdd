@@ -1,4 +1,4 @@
-FROM python:3.10.8-alpine3.16
+FROM python:3.10.12-alpine3.18
 
 RUN apk --no-cache --update add openssl libffi patch
 COPY requirements.txt .
