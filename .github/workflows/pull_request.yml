@@ -3,17 +3,13 @@ name: CI
 on:
   pull_request:
     branches: [ master ]
-  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: build
-        run: make build
-
-      - name: test examples
-        run: |
+      - uses: actions/checkout@v3
+      - run: make build
+      - run: |
           make test
           make test -e PYTEST_OPTS='--workers auto'
