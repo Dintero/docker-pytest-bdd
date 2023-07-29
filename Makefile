@@ -1,8 +1,10 @@
 TAG ?= dintero/docker-pytest-bdd
 PYTEST_ADDOPTS ?=-vv --gherkin-terminal-reporter --cucumberjson-expanded
+DOCKER_BUILDKIT ?= 1
 
+export DOCKER_BUILDKIT
 build:
-	@docker build -t $(TAG) .
+	@docker build --tag $(TAG) .
 
 test:
 	@docker run \
