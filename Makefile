@@ -1,4 +1,3 @@
-
 TAG ?= dintero/docker-pytest-bdd
 PYTEST_ADDOPTS ?=-vv --gherkin-terminal-reporter --cucumberjson-expanded
 
