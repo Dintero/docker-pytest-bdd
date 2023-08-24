@@ -15,7 +15,7 @@ idna==3.4
 iniconfig==1.1.1
 isoduration==20.11.0
 jmespath==1.0.1
-jsonpointer==2.3
+jsonpointer==2.4
 jsonref==1.0.1
 jsonschema==4.17.0
 Mako==1.2.4
