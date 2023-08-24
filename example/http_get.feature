@@ -7,6 +7,6 @@ Scenario: fetch urls
     Then response status should be <status>
 
     Examples:
-    | url                     | status      |
-    | https://httpstat.us/200 | OK          |
-    | https://httpstat.us/400 | BAD_REQUEST |
+    | url                   | status      |
+    | http://httpstatus/200 | OK          |
+    | http://httpstatus/400 | BAD_REQUEST |
