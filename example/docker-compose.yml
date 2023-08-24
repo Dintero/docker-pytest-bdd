@@ -1,0 +1,20 @@
+version: '3.4'
+
+services:
+  httpstatus:
+    image: python:3.10.12-alpine3.18
+    working_dir: /example
+    volumes:
+      - .:/example
+    command: python3 httpstatus.py
+
+  end-to-end-tests:
+    image: dintero/docker-pytest-bdd
+    working_dir: /example
+    volumes:
+      - .:/example
+    environment:
+      - PYTEST_ADDOPTS=${PYTEST_ADDOPTS}
+    depends_on:
+      - httpstatus
+    command: pytest
