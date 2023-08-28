@@ -1,5 +1,5 @@
 TAG ?= dintero/docker-pytest-bdd
-PYTEST_ADDOPTS ?=-vv --gherkin-terminal-reporter --cucumberjson-expanded
+PYTEST_ADDOPTS ?=-vv --gherkin-terminal-reporter
 COMPOSE_DEFAULT_FLAGS=-f example/docker-compose.yml
 DOCKER_BUILDKIT ?= 1
 
