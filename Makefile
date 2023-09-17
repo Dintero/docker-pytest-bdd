@@ -20,6 +20,6 @@ test: down
 	PYTEST_ADDOPTS="$(PYTEST_ADDOPTS)" docker-compose $(COMPOSE_DEFAULT_FLAGS) run --service-ports --rm end-to-end-tests
 
 publish: build
-	docker push $(TAG)
+	@docker buildx build --platform $(PLATFORMS) --tag $(TAG) --push .
 
 install: build test
