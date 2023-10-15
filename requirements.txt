@@ -32,10 +32,10 @@ pycodestyle==2.11.0
 pycparser==2.21
 pycryptodome==3.18.0
 pyparsing==3.1.1
-pyrsistent==0.19.2
+pyrsistent==0.19.3
+pytest==7.2.0
 pytest-bdd==4.1.0
 pytest-parallel==0.1.1
-pytest==7.2.0
 python-dateutil==2.8.2
 python-jose==3.3.0
 pytz==2023.3
