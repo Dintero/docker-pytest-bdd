@@ -10,4 +10,5 @@ RUN --mount=type=cache,target=/root/.cache python3 -m pip install -r requirement
 FROM python:3.10.12-alpine3.18
 RUN apk --no-cache --update add openssl libffi patch
 COPY --from=builder /opt/venv /opt/venv
+COPY requirements.txt .
 ENV PATH="/opt/venv/bin:$PATH"
