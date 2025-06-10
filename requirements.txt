@@ -28,7 +28,6 @@ parse-type==0.6.2
 PGPy==0.6.0
 pluggy==1.2.0
 py==1.11.0
-pyasn1==0.5.0
 pycodestyle==2.11.0
 pycparser==2.21
 pycryptodome==3.19.1
