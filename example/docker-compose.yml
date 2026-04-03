@@ -1,8 +1,6 @@
-version: '3.4'
-
 services:
   httpstatus:
-    image: python:3.10.12-alpine3.18
+    image: python:3.11.15-alpine3.23
     working_dir: /example
     volumes:
       - .:/example
