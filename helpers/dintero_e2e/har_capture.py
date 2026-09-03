@@ -35,7 +35,7 @@ so it doesn't drag anything onto the image's runtime deps.
 import base64
 import json
 import os
-from datetime import datetime, timezone
+from datetime import timezone
 from urllib.parse import parse_qsl, urlparse
 
 
@@ -48,10 +48,26 @@ def enabled():
 
 
 def _iso_utc(dt):
-    return dt.replace(tzinfo=timezone.utc).isoformat().replace("+00:00", "Z")
+    """Return dt as an ISO-8601 UTC string suffixed with Z.
+
+    Handles both naive (assumed already-UTC, matching the semantics of
+    the deprecated datetime.utcnow()) and timezone-aware inputs. For
+    aware datetimes we convert into UTC rather than relabelling — a
+    plain .replace(tzinfo=UTC) would silently reinterpret e.g. a
+    US/Pacific timestamp as if it were UTC.
+    """
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    else:
+        dt = dt.astimezone(timezone.utc)
+    return dt.isoformat().replace("+00:00", "Z")
 
 
 def _header_pairs(headers):
+    # HAR entries deliberately preserve all headers, including Authorization
+    # and Cookie. ZAP's active scan replays these entries against the target
+    # and needs the auth material to reach past 401 gates. Callers should
+    # treat the HAR output as sensitive and store it accordingly.
     return [{"name": str(k), "value": str(v)} for k, v in headers.items()]
 
 
