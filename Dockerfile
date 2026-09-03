@@ -6,6 +6,11 @@ ENV PATH="/opt/venv/bin:$PATH" \
 RUN --mount=type=cache,target=/root/.cache pip install wheel
 COPY requirements.txt .
 RUN --mount=type=cache,target=/root/.cache python3 -m pip install -r requirements.txt
+# Install dintero-e2e helpers (har_capture, ...) as an installable
+# package so consumers can `from dintero_e2e import har_capture`.
+COPY helpers /tmp/helpers
+RUN --mount=type=cache,target=/root/.cache python3 -m pip install --no-deps /tmp/helpers \
+    && rm -rf /tmp/helpers
 
 FROM python:3.11.15-alpine3.23
 RUN apk --no-cache --update add openssl libffi patch

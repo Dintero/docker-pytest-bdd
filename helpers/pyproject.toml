@@ -1,0 +1,15 @@
+[project]
+name = "dintero-e2e"
+version = "0.1.0"
+description = "Helpers for Dintero E2E test suites — imported by pytest-bdd feature files running inside dintero/docker-pytest-bdd."
+requires-python = ">=3.10"
+authors = [{name = "Dintero"}]
+license = {text = "Apache-2.0"}
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["dintero_e2e*"]
