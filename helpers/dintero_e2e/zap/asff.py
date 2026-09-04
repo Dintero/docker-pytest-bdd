@@ -121,7 +121,8 @@ def load_spec_paths(spec_path):
     keys under 'paths:'. If the spec ever grows a different indentation
     or format, replace this with a real YAML parse.
     """
-    text = open(spec_path).read()
+    with open(spec_path) as f:
+        text = f.read()
     base = ""
     m = re.search(r"^basePath:\s*(\S+)\s*$", text, re.M)
     if m:
@@ -304,7 +305,8 @@ def build_findings(alerts_path, spec_path, account_id, product_arn,
     base, templates = load_spec_paths(spec_path)
     matchers = compile_matchers(base, templates)
 
-    payload = json.load(open(alerts_path))
+    with open(alerts_path) as f:
+        payload = json.load(f)
     alerts = payload.get("alerts", payload) if isinstance(payload, dict) else payload
 
     # to_finding still expects an args-shaped object; give it one.

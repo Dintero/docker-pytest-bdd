@@ -143,10 +143,12 @@ def extract_messages(zap_url, alerts_path, out_dir, risk="High"):
         except Exception as e:
             print(f"[zap] failed to fetch messageId={mid}: {e}")
             continue
-        fname = f"plugin-{a['pluginId']}-msg-{mid}.json"
+        plugin = a.get("pluginId", "unknown")
+        alert_name = a.get("alert", "unknown")
+        fname = f"plugin-{plugin}-msg-{mid}.json"
         with open(os.path.join(out_dir, fname), "wb") as f:
             f.write(data)
-        print(f"[zap] saved {a['alert']} messageId={mid} -> {fname}")
+        print(f"[zap] saved {alert_name} messageId={mid} -> {fname}")
         n += 1
 
     print(f"[zap] captured {n} {risk}-severity request/response pairs")

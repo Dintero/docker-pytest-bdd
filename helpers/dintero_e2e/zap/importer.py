@@ -36,9 +36,9 @@ def import_findings(alerts_path, spec_path, repo, *,
         )
 
     if branch is None:
-        # CodeBuild sets CODEBUILD_SOURCE_VERSION to `refs/heads/<name>`
-        # for branch builds and to the commit sha for tag/PR builds. The
-        # sh prefix is redundant in the ProductFields payload.
+        # CodeBuild sets CODEBUILD_SOURCE_VERSION to "refs/heads/<name>"
+        # for branch builds and to the commit sha for tag/PR builds.
+        # Strip the refs/heads/ prefix for the ProductFields payload.
         raw = os.environ.get("CODEBUILD_SOURCE_VERSION", "")
         branch = raw[len("refs/heads/"):] if raw.startswith("refs/heads/") else raw
 
@@ -60,11 +60,22 @@ def import_findings(alerts_path, spec_path, repo, *,
 
     print(f"[securityhub] importing {len(findings)} findings to region={region}")
     sh = boto3.client("securityhub", region_name=region)
-    resp = sh.batch_import_findings(Findings=findings)
-    print(f"[securityhub] success={resp['SuccessCount']} "
-          f"failed={resp['FailedCount']}")
-    for f in resp.get("FailedFindings", []):
+
+    # BatchImportFindings caps at 100 findings per call. Chunk and
+    # aggregate so a > 100-finding run doesn't fail the whole import.
+    BATCH = 100
+    total_success = 0
+    total_failed = 0
+    failed_findings = []
+    for i in range(0, len(findings), BATCH):
+        resp = sh.batch_import_findings(Findings=findings[i:i + BATCH])
+        total_success += resp["SuccessCount"]
+        total_failed += resp["FailedCount"]
+        failed_findings.extend(resp.get("FailedFindings", []))
+
+    print(f"[securityhub] success={total_success} failed={total_failed}")
+    for f in failed_findings:
         print(f"[securityhub] failed: Id={f.get('Id')} "
               f"code={f.get('ErrorCode')} msg={f.get('ErrorMessage')}")
-    if resp["FailedCount"]:
+    if total_failed:
         raise SystemExit(1)
