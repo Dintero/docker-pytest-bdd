@@ -9,7 +9,7 @@ of our stacks use).
 
 import argparse
 
-from . import client
+from . import client, importer
 
 
 def _add_zap_arg(parser):
@@ -91,6 +91,30 @@ def main():
     p_extract.add_argument("--risk", default="High",
                            help="Alert risk level to extract (default: High).")
 
+    p_import = sub.add_parser(
+        "import",
+        help=("Convert zap-alerts.json to ASFF and upload to Security Hub. "
+              "Auto-detects account via STS; branch from $CODEBUILD_SOURCE_VERSION."),
+    )
+    p_import.add_argument("--alerts", required=True,
+                          help="Path to a zap-alerts.json file.")
+    p_import.add_argument("--spec", required=True,
+                          help="OpenAPI/Swagger spec used to template URL paths.")
+    p_import.add_argument("--repo", required=True,
+                          help="Repo name, exposed as ProductFields[Dintero:Repo].")
+    p_import.add_argument("--branch", default=None,
+                          help="Branch name; default: $CODEBUILD_SOURCE_VERSION.")
+    p_import.add_argument("--region", default="eu-west-1",
+                          help="Security Hub region (default: eu-west-1).")
+    p_import.add_argument("--account-id", default=None,
+                          help="AWS account; default: STS get-caller-identity.")
+    p_import.add_argument("--product-arn", default=None,
+                          help="ProductArn; default: default product in --region.")
+    p_import.add_argument("--min-confidence", default="High",
+                          choices=["Low", "Medium", "High"])
+    p_import.add_argument("--out", default=None,
+                          help="If set, also write ASFF findings JSON to this path.")
+
     args = parser.parse_args()
 
     if args.command == "wait":
@@ -107,6 +131,13 @@ def main():
         client.dump_alerts(args.zap, args.out)
     elif args.command == "extract-messages":
         client.extract_messages(args.zap, args.alerts, args.out, args.risk)
+    elif args.command == "import":
+        importer.import_findings(
+            args.alerts, args.spec, args.repo,
+            branch=args.branch, region=args.region,
+            account_id=args.account_id, product_arn=args.product_arn,
+            min_confidence=args.min_confidence, out_path=args.out,
+        )
 
 
 if __name__ == "__main__":

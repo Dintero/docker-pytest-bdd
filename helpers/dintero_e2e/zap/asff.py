@@ -17,6 +17,7 @@ import hashlib
 import json
 import re
 import sys
+import types
 from datetime import datetime, timezone
 from urllib.parse import urlparse
 
@@ -288,6 +289,45 @@ def to_finding(alert, matchers, args, now):
     return finding
 
 
+def build_findings(alerts_path, spec_path, account_id, product_arn,
+                   min_confidence="High", now=None, repo="", branch=""):
+    """Convert a ZAP alerts JSON file into a list of ASFF findings.
+
+    Shared entry point for both the standalone `dintero-zap-to-asff` CLI
+    and the `dintero-zap import` subcommand that additionally uploads to
+    Security Hub. Returns (findings_list, alerts_count, dropped_count)
+    so callers can log/skip empty imports.
+    """
+    now = now or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+    threshold = CONFIDENCE[min_confidence]
+
+    base, templates = load_spec_paths(spec_path)
+    matchers = compile_matchers(base, templates)
+
+    payload = json.load(open(alerts_path))
+    alerts = payload.get("alerts", payload) if isinstance(payload, dict) else payload
+
+    # to_finding still expects an args-shaped object; give it one.
+    args_ns = types.SimpleNamespace(
+        account_id=account_id, product_arn=product_arn,
+        repo=repo, branch=branch,
+    )
+
+    findings = {}
+    dropped = 0
+    for a in alerts:
+        risk = a.get("risk", "Informational")
+        conf = a.get("confidence", "Low")
+        if risk != "High" and CONFIDENCE.get(conf, 0) < threshold:
+            dropped += 1
+            continue
+        f = to_finding(a, matchers, args_ns, now)
+        validate_finding(f)
+        findings.setdefault(f["Id"], f)
+
+    return list(findings.values()), len(alerts), dropped
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("--input", required=True,
@@ -312,32 +352,17 @@ def main():
                    help="Branch name, exposed as ProductFields[Dintero:Branch].")
     args = p.parse_args()
 
-    now = args.now or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000Z")
-    threshold = CONFIDENCE[args.min_confidence]
+    findings, n_alerts, dropped = build_findings(
+        args.input, args.spec, args.account_id, args.product_arn,
+        min_confidence=args.min_confidence, now=args.now,
+        repo=args.repo, branch=args.branch,
+    )
 
-    base, templates = load_spec_paths(args.spec)
-    matchers = compile_matchers(base, templates)
-
-    payload = json.load(open(args.input))
-    alerts = payload.get("alerts", payload) if isinstance(payload, dict) else payload
-
-    findings = {}
-    dropped = 0
-    for a in alerts:
-        risk = a.get("risk", "Informational")
-        conf = a.get("confidence", "Low")
-        if risk != "High" and CONFIDENCE.get(conf, 0) < threshold:
-            dropped += 1
-            continue
-        f = to_finding(a, matchers, args, now)
-        validate_finding(f)
-        findings.setdefault(f["Id"], f)
-
-    print(f"[zap-to-asff] {len(alerts)} alerts → {len(findings)} unique findings"
+    print(f"[zap-to-asff] {n_alerts} alerts → {len(findings)} unique findings"
           f" (dropped {dropped} below min-confidence={args.min_confidence})",
           file=sys.stderr)
 
-    json.dump({"Findings": list(findings.values())}, sys.stdout, indent=2)
+    json.dump({"Findings": findings}, sys.stdout, indent=2)
     sys.stdout.write("\n")
 
 
