@@ -1,10 +1,12 @@
 [project]
 name = "dintero-e2e"
-version = "0.1.0"
-description = "Helpers for Dintero E2E test suites — imported by pytest-bdd feature files running inside dintero/docker-pytest-bdd."
+version = "0.3.0"
+description = "Helpers for Dintero E2E test suites — imported by pytest-bdd feature files running inside dintero/docker-pytest-bdd, plus ZAP scan orchestration CLIs."
 requires-python = ">=3.10"
-authors = [{name = "Dintero"}]
-license = {text = "Apache-2.0"}
+
+[project.scripts]
+dintero-zap = "dintero_e2e.zap.cli:main"
+dintero-zap-to-asff = "dintero_e2e.zap.asff:main"
 
 [build-system]
 requires = ["setuptools>=61"]
